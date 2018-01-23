@@ -1,4 +1,5 @@
 LipidWrapper 1.15
+=================
 
 As ever larger and more complex biological systems are modeled in 
 silico, approximating physiological lipid bilayers with simple 
@@ -13,7 +14,7 @@ are hopeful that this utility will be a useful tool for the
 computational-biology community.
 
 Installation
-============
+------------
 As a python script, LipidWrapper should run on any operating system
 that has python, numpy, and scipy installed, without requiring the
 installation of additional software. If the user optionally wishes 
@@ -28,11 +29,11 @@ models, and image-defined surfaces. Test PDB, DAE, and PNG files are
 included.
 
 Command-Line Parameters
-=======================
+-----------------------
 
-Methods for creating a surface mesh
-===================================
+### Methods for creating a surface mesh ###
 
+```
 --surface_equation: Generate a surface mesh from a python-formatted
       equation defining z, given x and y. The --min_x, --max_x,
       --min_y, and --max_y parameters are used to specify the region
@@ -56,10 +57,12 @@ Methods for creating a surface mesh
       is white; black regions are assigned a height of 0. This feature
       is only available if the python PIL module has been installed on
       your system. Example: --surface_filename mymesh.png
+```
 
 The initial lipid model
-=======================
+-----------------------
 
+```
 --lipid_pdb_filename: This parameter specifies a PDB file containing
       an all-atom model of a planar lipid bilayer. LipidWrapper will
       wrap this lipid around the user-generated mesh. Example:
@@ -72,10 +75,12 @@ The initial lipid model
       identifies lipid headgroups by looking for any atom named "P"
       (_P) or any atom named "O3" belonging to a cholesterol molecule
       (CHL1_O3). Example: --lipid_headgroup_marker "_P,CHL1_O3"
+```
 
 Methods for resolving lipid clashes
-===================================
+-----------------------------------
 
+```
 --delete_clashing_lipids: It's common for lipids to sterically clash
       at the interface of two adjacent surface-mesh tessellated
       triangles. If this parameter is set to TRUE, any clashing lipids
@@ -126,10 +131,12 @@ Methods for resolving lipid clashes
       pair and so uses less memory, albeit at the expensive of speed.
       Only increase the value of this parameter if you run into memory
       errors. Example: --memory_optimization_factor 1
+```
 
 Additional options
-==================
+------------------
 
+```
 --number_of_processors: Using multiple processors can significantly
       increase the speed of the LipidWrapper algorithm. Example:
       --number_of_processors 8
@@ -159,10 +166,12 @@ Additional options
       compressed using the gzip algorithm (Lempel-Ziv coding LZ77).
       The files can be uncompressed with the UNIX gunzip utility, or
       similar Windows-based packages. Example: --compress_output TRUE
+```
 
 Example
-=======
+-------
 
+```
 python lipidwrapper.py --surface_equation "z = 250*numpy.sin(x*x/60000
       +y*y/60000) * (-numpy.sqrt(x*x+y*y)/(560 * numpy.sqrt(2)) + 1)"
       --min_x 500 --max_x 1000 --min_y 500 --max_y 1000 --step_x 25
@@ -170,4 +179,4 @@ python lipidwrapper.py --surface_equation "z = 250*numpy.sin(x*x/60000
       --lipid_headgroup_marker "_P,CHL1_O3" --delete_clashing_lipids
       TRUE --clash_cutoff 1.0 --fill_holes TRUE
       --fill_hole_exhaustiveness 10 > lipid_model.pdb
-
+```
