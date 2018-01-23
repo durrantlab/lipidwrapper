@@ -1,4 +1,4 @@
-LipidWrapper 1.0
+LipidWrapper 1.15
 
 As ever larger and more complex biological systems are modeled in 
 silico, approximating physiological lipid bilayers with simple 

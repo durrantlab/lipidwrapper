@@ -27,7 +27,7 @@ The views and conclusions contained in the software and documentation are those
 of the authors and should not be interpreted as representing official policies, 
 either expressed or implied, of the FreeBSD Project.'''
 
-version = "1.14"
+version = "1.15"
 
 import sys
 import math
@@ -48,6 +48,7 @@ import cPickle as pickle
 import string
 import platform
 import gzip
+import warnings
 
 ################## MULTIPROCESSING ##################
 
@@ -1189,7 +1190,7 @@ def load_mesh_points_and_triangulations(params):
         
         for x in numpy.arange(0, width, params['step_x']):
             for y in numpy.arange(0, height, params['step_y']):
-                z = params['max_height'] * pic[x,y,0]/255.0 # 0 because it's R, G, B, alpha, and images should be greyscale
+                z = params['max_height'] * pic[int(x),int(y),0]/255.0 # 0 because it's R, G, B, alpha, and images should be greyscale
                 pts_list.append(numpy.array([x + params['min_x'], y + params['min_y'], z]))
         pts.all_atoms_numpy = numpy.array(pts_list)
     
@@ -1541,13 +1542,19 @@ def position_lipid_model_on_triangulated_tiles(params, lipid, all_triangles, min
                 single_lipid.in_triangle_submargin = False
                 single_lipid.in_triangle_margin = True
                 
-                if all_ids[start_index] in hg_ids_not_in_triangle_margin:
-                    single_lipid.in_triangle_margin = False
+                ### POSSIBLE FUTURE PROBLEM HERE. ###
+                # See https://stackoverflow.com/questions/40659212/futurewarning-elementwise-comparison-failed-returning-scalar-but-in-the-futur
+                # Kicking the can down the road, as suggested...
+                with warnings.catch_warnings():  # Kicking the can
+                    warnings.simplefilter(action='ignore', category=FutureWarning)  # down the road...
+
+                    if all_ids[start_index] in hg_ids_not_in_triangle_margin:
+                        single_lipid.in_triangle_margin = False
+                        
+                        if not all_ids[start_index] in hg_ids_not_in_triangle_margin_or_submargin:
+                            single_lipid.in_triangle_submargin = True
                     
-                    if not all_ids[start_index] in hg_ids_not_in_triangle_margin_or_submargin:
-                        single_lipid.in_triangle_submargin = True
-                
-                molecules_in_this_triangle.append(single_lipid)
+                    molecules_in_this_triangle.append(single_lipid)
             
             if params['use_disk_instead_of_memory'] == "TRUE":
                 an_id = save_pickle(molecules_in_this_triangle, params)
@@ -2043,7 +2050,7 @@ def fill_in_lipid_holes(molecules_by_triangle, params):
             
             # now that the plane has been identified, find the average distance between the plane and lipid headgroups
             # also, start adding lipids that could clash with future inserted lipids into the neighborhood_lipids_that_could_clash list. All lipids in the margin and submargin of the central triangle will be added.
-            lipid_head_indices = numpy.empty(len(lipids))
+            lipid_head_indices = numpy.empty(len(lipids), dtype=numpy.int)
             for indx, lipid in enumerate(lipids):
                 lipid_head_indices[indx] = lipid.get_headgroup_index(params['lipid_headgroup_marker'])
             
